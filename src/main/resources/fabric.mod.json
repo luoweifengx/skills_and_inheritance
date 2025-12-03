@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "fengx-skills-and-inheritance",
+	"version": "${version}",
+	"name": "Fengx Skills and Inheritance",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/fengx-skills-and-inheritance/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"luowei.fengxskillsandinter.FengxSkillsAndInheritance"
+		],
+		"client": [
+			"luowei.fengxskillsandinter.FengxSkillsAndInheritanceClient"
+		]
+	},
+	"mixins": [
+		"fengx-skills-and-inheritance.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
