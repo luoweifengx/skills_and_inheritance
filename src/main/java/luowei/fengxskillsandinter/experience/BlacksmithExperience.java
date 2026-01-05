@@ -16,10 +16,16 @@ public class BlacksmithExperience {
     
     /**
      * 获取玩家的铁匠经验值
+     * 注意：客户端和服务端都能读取，但数据只在服务端修改
      */
     public static int getExperience(PlayerEntity player) {
+        // 使用writeNbt获取玩家NBT数据
         NbtCompound nbt = player.writeNbt(new NbtCompound());
-        return nbt.getInt(NBT_KEY).orElse(0);
+        // 检查是否包含经验值键
+        if (nbt.contains(NBT_KEY)) {
+            return nbt.getInt(NBT_KEY).orElse(0);
+        }
+        return 0;
     }
     
     /**
@@ -38,10 +44,23 @@ public class BlacksmithExperience {
     
     /**
      * 增加玩家的铁匠经验值
+     * @return 是否升级了
      */
-    public static void addExperience(PlayerEntity player, int amount) {
+    public static boolean addExperience(PlayerEntity player, int amount) {
+        int currentLevel = getLevel(player);
         int current = getExperience(player);
         setExperience(player, current + amount);
+        int newLevel = getLevel(player);
+        
+        // 检测是否升级
+        if (newLevel > currentLevel) {
+            // 播放升级音效（在服务端）
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                serverPlayer.playSound(net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            }
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -74,8 +93,12 @@ public class BlacksmithExperience {
             return 1.0f;
         }
         
-        int currentLevelMin = BlacksmithConfig.LEVEL_THRESHOLDS[level];
-        int nextLevelMin = BlacksmithConfig.LEVEL_THRESHOLDS[level + 1];
+        // 等级对应数组索引：1级对应索引1，2级对应索引2，以此类推
+        int currentLevelIndex = level;
+        int nextLevelIndex = Math.min(level + 1, BlacksmithConfig.LEVEL_THRESHOLDS.length - 1);
+        
+        int currentLevelMin = BlacksmithConfig.LEVEL_THRESHOLDS[currentLevelIndex];
+        int nextLevelMin = BlacksmithConfig.LEVEL_THRESHOLDS[nextLevelIndex];
         
         return (float)(exp - currentLevelMin) / (nextLevelMin - currentLevelMin);
     }

@@ -136,22 +136,22 @@ public class WeaponAttributes {
     
     /**
      * 计算下一次打磨的成功率
-     * 公式：材料系数^(x-y) × (1+m%)
+     * 公式：材料系数^(x-y)
      */
-    public static double calculatePolishSuccessRate(ItemStack stack, int playerLevel, double hammerBoost) {
+    public static double calculatePolishSuccessRate(ItemStack stack, int playerLevel) {
         if (!hasCoating(stack)) {
             return 0.0;
         }
         
         String coatingType = getCoatingType(stack);
-        return calculatePolishSuccessRateForCoating(stack, coatingType, playerLevel, hammerBoost);
+        return calculatePolishSuccessRateForCoating(stack, coatingType, playerLevel);
     }
     
     /**
      * 计算指定镀层类型的打磨成功率（用于显示下次成功率）
-     * 公式：材料系数^(x-y) × (1+m%)
+     * 公式：材料系数^(x-y)
      */
-    public static double calculatePolishSuccessRateForCoating(ItemStack stack, String coatingType, int playerLevel, double hammerBoost) {
+    public static double calculatePolishSuccessRateForCoating(ItemStack stack, String coatingType, int playerLevel) {
         if (coatingType == null || coatingType.isEmpty()) {
             return 0.0;
         }
@@ -159,9 +159,8 @@ public class WeaponAttributes {
         double coefficient = BlacksmithConfig.getCoatingCoefficient(coatingType);
         int polishCount = getPolishCount(stack);
         
-        // 计算成功率：coefficient^(x-y) × (1+m%)
-        double baseRate = Math.pow(coefficient, polishCount - playerLevel);
-        double finalRate = baseRate * (1.0 + hammerBoost);
+        // 计算成功率：coefficient^(x-y)
+        double finalRate = Math.pow(coefficient, polishCount - playerLevel);
         
         // 限制在0-100%之间
         return Math.max(0.0, Math.min(1.0, finalRate));

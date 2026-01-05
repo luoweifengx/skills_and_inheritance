@@ -7,18 +7,11 @@ package luowei.fengxskillsandinter.config;
 public class BlacksmithConfig {
     
     // ============ 铁匠经验等级配置 ============
-    public static final int[] LEVEL_THRESHOLDS = {0, 300, 900, 2100, 4500, 9999};
-    public static final int MAX_LEVEL = 5;
-    
-    // ============ 锤子临时加强配置 ============
-    // m值：锤子品质对应的成功率加成（百分比形式）
-    public static final double WOODEN_HAMMER_BOOST = 0.05;  // 5%
-    public static final double IRON_HAMMER_BOOST = 0.08;    // 8%
-    public static final double DIAMOND_HAMMER_BOOST = 0.12; // 12%
-    
-    // 临时加强消耗
-    public static final int BOOST_VANILLA_XP_COST = 50;     // 原版经验值
-    public static final int BOOST_BLACKSMITH_XP_COST = 40;  // 铁匠经验值
+    // 等级范围：1-6级（0级改为1级）
+    // 阈值数组：[0经验起点, 1级, 2级, 3级, 4级, 5级, 6级]
+    public static final int[] LEVEL_THRESHOLDS = {0, 300, 900, 2100, 4500, 9999, 20000};
+    public static final int MAX_LEVEL = 6;
+    public static final int MIN_LEVEL = 1; // 最低等级为1级
     
     // ============ 镀层材料系数配置（成功率底表） ============
     public static final double COPPER_COATING_COEFFICIENT = 0.80;
@@ -48,26 +41,16 @@ public class BlacksmithConfig {
     
     /**
      * 获取玩家当前铁匠等级（基于经验值）
+     * 返回范围：1-6级（最低1级，最高6级）
      */
     public static int getLevel(int experience) {
         for (int i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
             if (experience >= LEVEL_THRESHOLDS[i]) {
-                return i;
+                // 返回等级（索引对应等级，0经验对应1级）
+                return Math.max(MIN_LEVEL, i);
             }
         }
-        return 0;
-    }
-    
-    /**
-     * 根据锤子类型获取临时加强加成
-     */
-    public static double getHammerBoost(String hammerType) {
-        return switch (hammerType) {
-            case "wooden" -> WOODEN_HAMMER_BOOST;
-            case "iron" -> IRON_HAMMER_BOOST;
-            case "diamond" -> DIAMOND_HAMMER_BOOST;
-            default -> 0.0;
-        };
+        return MIN_LEVEL; // 默认返回1级
     }
     
     /**
@@ -104,4 +87,10 @@ public class BlacksmithConfig {
         };
     }
 }
+
+
+
+
+
+
 

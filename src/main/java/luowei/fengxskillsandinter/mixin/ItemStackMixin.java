@@ -45,6 +45,8 @@ public class ItemStackMixin {
         
         // 如果amount > 0，说明消耗了耐久
         if (amount > 0) {
+            // 初始化物品经验为整型上限（如果还没有经验）
+            ItemExperience.initializeMaxExperience(stack);
             // 增加物品经验（每次消耗耐久+1经验）
             ItemExperience.addExperience(stack, 1);
         }

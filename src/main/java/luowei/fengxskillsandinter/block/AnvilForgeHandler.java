@@ -218,6 +218,12 @@ public class AnvilForgeHandler {
             return false;
         }
 
+        // 检查并消耗物品经验（50点）
+        if (!luowei.fengxskillsandinter.item.ItemExperience.consumeExperience(anvilState.items[0], 50)) {
+            player.sendMessage(Text.literal("§c物品经验不足，无法锻造（需要50点经验）"), true);
+            return false;
+        }
+
         // 执行镀层操作
         WeaponAttributes.setCoating(anvilState.items[0], coatingType);
 
@@ -237,11 +243,6 @@ public class AnvilForgeHandler {
         anvilState.clear();
 
         player.sendMessage(Text.literal("§a锻造成功！已添加" + coatingType + "镀层"), true);
-
-        // 如果锤子处于加强状态，消耗加强
-        if (HammerItem.isBoosted(hammerStack)) {
-            HammerItem.consumeBoost(hammerStack);
-        }
 
         return true;
     }

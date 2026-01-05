@@ -1,4 +1,7 @@
 {
-  "parent": "minecraft:item/wooden_hoe"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fengx-skills-and-inheritance:item/wooden_hammer"
+  }
 }
 

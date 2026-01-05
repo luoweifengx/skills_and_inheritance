@@ -7,7 +7,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import luowei.fengxskillsandinter.weapon.WeaponAttributes;
 import luowei.fengxskillsandinter.weapon.WeaponAttributeHelper;
-import luowei.fengxskillsandinter.item.HammerItem;
 import luowei.fengxskillsandinter.item.ItemExperience;
 
 import java.util.List;
@@ -33,20 +32,13 @@ public class ItemTooltipCallback {
                     }
                 }
                 
-                // 显示锤子加强状态
-                if (stack.getItem() instanceof HammerItem) {
-                    if (HammerItem.isBoosted(stack)) {
-                        lines.add(Text.literal("§6✦ 临时加强状态"));
-                    }
-                }
-                
                 // 显示物品经验（新系统）
                 if (WeaponAttributeHelper.isWeapon(stack) || WeaponAttributeHelper.isTool(stack)) {
                     int itemExp = ItemExperience.getItemExperience(stack);
                     if (itemExp > 0) {
                         lines.add(Text.literal("§7§m-------------------"));
                         lines.add(Text.literal(String.format("§b物品经验: §e%d", itemExp)));
-                        lines.add(Text.literal("§7§m-------------------"));
+                    lines.add(Text.literal("§7§m-------------------"));
                     }
                 }
             }

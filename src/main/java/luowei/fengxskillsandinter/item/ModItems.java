@@ -85,8 +85,9 @@ public class ModItems {
      * 注册物品
      */
     private static Item registerItem(String name, Item item) {
-        return Registry.register(Registries.ITEM, 
-            Identifier.of(FengxSkillsAndInheritance.MOD_ID, name), item);
+        Identifier id = Identifier.of(FengxSkillsAndInheritance.MOD_ID, name);
+        FengxSkillsAndInheritance.LOGGER.info("注册物品: {} -> {}", name, id);
+        return Registry.register(Registries.ITEM, id, item);
     }
 }
 

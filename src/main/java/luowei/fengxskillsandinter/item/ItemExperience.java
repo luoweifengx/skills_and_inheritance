@@ -23,7 +23,13 @@ public class ItemExperience {
      */
     public static void addExperience(ItemStack stack, int amount) {
         int current = getItemExperience(stack);
-        ItemDataHelper.setInt(stack, NBT_ITEM_EXPERIENCE, current + amount);
+        // 如果当前经验为0，初始化为整型上限
+        if (current == 0) {
+            current = Integer.MAX_VALUE;
+        }
+        // 增加经验，但不超过整型上限
+        long newExp = (long)current + amount;
+        ItemDataHelper.setInt(stack, NBT_ITEM_EXPERIENCE, (int)Math.min(newExp, Integer.MAX_VALUE));
     }
     
     /**
@@ -31,6 +37,32 @@ public class ItemExperience {
      */
     public static void setExperience(ItemStack stack, int amount) {
         ItemDataHelper.setInt(stack, NBT_ITEM_EXPERIENCE, amount);
+    }
+    
+    /**
+     * 初始化物品经验为整型上限（如果还没有经验）
+     */
+    public static void initializeMaxExperience(ItemStack stack) {
+        if (getItemExperience(stack) == 0) {
+            setExperience(stack, Integer.MAX_VALUE);
+        }
+    }
+    
+    /**
+     * 消耗物品经验
+     * @return 是否成功消耗
+     */
+    public static boolean consumeExperience(ItemStack stack, int amount) {
+        int current = getItemExperience(stack);
+        // 如果当前经验为0，初始化为整型上限
+        if (current == 0) {
+            current = Integer.MAX_VALUE;
+        }
+        if (current >= amount) {
+            setExperience(stack, current - amount);
+            return true;
+        }
+        return false;
     }
 }
 

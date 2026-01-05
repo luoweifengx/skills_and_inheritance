@@ -8,6 +8,9 @@
 		"PlayerEntityMixin",
 		"ItemStackMixin"
 	],
+	"client": [
+		"InGameHudMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	},

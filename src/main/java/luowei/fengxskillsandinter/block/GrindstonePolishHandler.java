@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import luowei.fengxskillsandinter.config.BlacksmithConfig;
 import luowei.fengxskillsandinter.experience.BlacksmithExperience;
-import luowei.fengxskillsandinter.item.HammerItem;
 import luowei.fengxskillsandinter.weapon.WeaponAttributes;
 
 import java.util.Random;
@@ -94,31 +93,16 @@ public class GrindstonePolishHandler {
         // 获取玩家铁匠等级
         int playerLevel = BlacksmithExperience.getLevel(player);
         
-        // 检查玩家是否持有锤子（用于计算加成）
-        double hammerBoost = 0.0;
-        ItemStack offhandStack = player.getStackInHand(Hand.OFF_HAND);
-        if (offhandStack.getItem() instanceof HammerItem hammerItem) {
-            if (HammerItem.isBoosted(offhandStack)) {
-                hammerBoost = BlacksmithConfig.getHammerBoost(hammerItem.getHammerType());
-            }
-        }
-        
         // 获取镀层类型和成长数值
         String coatingType = WeaponAttributes.getCoatingType(stack);
         double[] growth = BlacksmithConfig.getGrowthValues(coatingType);
 
         // 计算成功率（打磨前的成功率）- 在移除镀层之前计算
-        double successRate = WeaponAttributes.calculatePolishSuccessRate(stack, playerLevel, hammerBoost);
+        double successRate = WeaponAttributes.calculatePolishSuccessRate(stack, playerLevel);
         boolean success = RANDOM.nextDouble() < successRate;
-        
+
         // 保存镀层类型，用于后续显示（因为镀层会被移除）
         String savedCoatingType = coatingType;
-
-        // 先消耗副手锤子的加强状态和镀层
-        if (offhandStack.getItem() instanceof HammerItem && HammerItem.isBoosted(offhandStack)) {
-            HammerItem.consumeBoost(offhandStack);
-            player.sendMessage(Text.literal("§7锤子加强已消耗"), true);
-        }
 
         // 消耗镀层（无论成功失败都要消耗）
         WeaponAttributes.removeCoating(stack);
@@ -156,7 +140,7 @@ public class GrindstonePolishHandler {
         // 计算下次成功率（需要重新镀层后，使用相同的镀层类型）
         // 使用保存的镀层类型和当前的成功次数来计算
         double nextSuccessRate = WeaponAttributes.calculatePolishSuccessRateForCoating(
-            stack, savedCoatingType, playerLevel, hammerBoost);
+            stack, savedCoatingType, playerLevel);
 
         if (success) {
             player.sendMessage(Text.literal(String.format("§a§l打磨成功！ §r§a攻击伤害 %+.1f, 攻击速度 %+.2f",
