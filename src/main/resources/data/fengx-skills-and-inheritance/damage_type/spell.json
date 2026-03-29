@@ -1,0 +1,7 @@
+{
+  "message_id": "spell",
+  "exhaustion": 0.05,
+  "scaling": "never",
+  "effects": "hurt",
+  "death_message_type": "default"
+}

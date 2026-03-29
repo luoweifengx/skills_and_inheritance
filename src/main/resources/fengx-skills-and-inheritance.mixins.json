@@ -2,14 +2,8 @@
 	"required": true,
 	"package": "luowei.fengxskillsandinter.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"AnvilBlockMixin",
-		"GrindstoneBlockMixin",
-		"PlayerEntityMixin",
-		"ItemStackMixin"
-	],
+	"mixins": [],
 	"client": [
-		"InGameHudMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

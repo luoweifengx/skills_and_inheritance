@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "fengx-skills-and-inheritance:burst_3",
+    "count": 1
+  }
+}

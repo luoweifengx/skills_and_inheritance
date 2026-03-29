@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "YRY",
+    "BNB",
+    " S "
+  ],
+  "key": {
+    "Y": "minecraft:yellow_dye",
+    "R": "minecraft:redstone",
+    "B": "minecraft:iron_block",
+    "N": "minecraft:netherite_ingot",
+    "S": "minecraft:nether_star"
+  },
+  "result": {
+    "id": "fengx-skills-and-inheritance:nuke",
+    "count": 1
+  }
+}

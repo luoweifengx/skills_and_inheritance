@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:torch",
+    "minecraft:gunpowder"
+  ],
+  "result": {
+    "id": "fengx-skills-and-inheritance:spark_projectile",
+    "count": 1
+  }
+}

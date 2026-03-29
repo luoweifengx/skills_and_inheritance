@@ -5,8 +5,12 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import luowei.fengxskillsandinter.entity.ModEntities;
+import luowei.fengxskillsandinter.event.ManaCharge;
 import luowei.fengxskillsandinter.item.ModItems;
-import luowei.fengxskillsandinter.villager.BlacksmithTrades;
+import luowei.fengxskillsandinter.network.ModNetwork;
+import luowei.fengxskillsandinter.spell.SpellRegistry;
+//import luowei.fengxskillsandinter.villager.BlacksmithTrades;
 
 public class FengxSkillsAndInheritance implements ModInitializer {
 	public static final String MOD_ID = "fengx-skills-and-inheritance";
@@ -22,14 +26,17 @@ public class FengxSkillsAndInheritance implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Initializing Fengx Skills and Inheritance Mod - Blacksmith System");
-		
+		// 注册村民交易
+		//BlacksmithTrades.registerTrades();
 		// 注册物品
 		ModItems.registerModItems();
 		
-		// 注册村民交易
-		BlacksmithTrades.registerTrades();
-		
-		LOGGER.info("Fengx Skills and Inheritance Mod initialized successfully!");
+		ModEntities.registerModEntities();
+
+		ModNetwork.register();
+
+		SpellRegistry.registerSpells();
+
+		ManaCharge.manaCharge();
 	}
 }

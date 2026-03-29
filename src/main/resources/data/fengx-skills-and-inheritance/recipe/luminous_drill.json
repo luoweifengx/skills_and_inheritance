@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    " A ",
+    " A "
+  ],
+  "key": {
+    "E": "minecraft:emerald",
+    "A": "minecraft:amethyst_shard"
+  },
+  "result": {
+    "id": "fengx-skills-and-inheritance:luminous_drill",
+    "count": 1
+  }
+}

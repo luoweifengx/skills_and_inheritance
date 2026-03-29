@@ -1,0 +1,17 @@
+Mod开头的都是用于集中管理物品，其余细分用于实现具体设计
+例如
+ModItems用于注册物品，内部包含物品注册逻辑
+WandItem用于管理法杖的各种行为，潜行右键打开法术容器，右键施法
+
+另外spell目录下，spells来存储法术具体实现，比如实体的调用就在内部实现
+外部的spell为抽象类，提供接口
+SpellCastContext用于管理上下文，未来的增益辅助法术相关，以及充能和释放延迟，都需要前一次传入上下文
+SpellCaster为法术释放器，当前是使用一个固定序列，未来为法杖自定义序列
+SpellRegistry走自己的注册通道，将id，物品，法术绑定在一起
+
+util内ItemDataHelper为创建nbt与具体数值的映射
+
+WandScreenHandler创建ui，其中自己编写存入逻辑和保存逻辑
+
+network内C2S是定义了包格式
+ModNetwork则是注册了包，与处理逻辑

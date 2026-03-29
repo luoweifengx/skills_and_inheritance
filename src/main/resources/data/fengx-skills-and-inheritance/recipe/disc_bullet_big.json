@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BIB",
+    "ISI",
+    "BIB"
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "B": "minecraft:iron_ingot",
+    "S": "minecraft:stone"
+  },
+  "result": {
+    "id": "fengx-skills-and-inheritance:disc_bullet_big",
+    "count": 1
+  }
+}
