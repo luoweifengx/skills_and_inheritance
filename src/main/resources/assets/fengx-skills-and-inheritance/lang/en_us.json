@@ -1,4 +1,5 @@
 {
+  "itemGroup.fengx-skills-and-inheritance.main": "Fengx Skills and Inheritance",
   "item.fengx-skills-and-inheritance.birth_gift": "Birth Gift",
   "item.fengx-skills-and-inheritance.wooden_hammer": "Wooden Hammer",
   "item.fengx-skills-and-inheritance.iron_hammer": "Iron Hammer",
@@ -22,6 +23,7 @@
   "item.fengx-skills-and-inheritance.disc_bullet_big": "Disc Bullet Big",
   "item.fengx-skills-and-inheritance.teleport_projectile": "Teleport Projectile",
   "item.fengx-skills-and-inheritance.regeneration_field": "Regeneration Field",
+  "item.fengx-skills-and-inheritance.black_hole": "Black Hole",
   "item.fengx-skills-and-inheritance.recharge": "Recharge",
   "item.fengx-skills-and-inheritance.mana": "Mana Surge",
   "item.fengx-skills-and-inheritance.spell_core": "Spell Core",

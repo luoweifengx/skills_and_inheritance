@@ -22,6 +22,7 @@ public class ModEntities {
     public static RegistryKey<EntityType<?>> BUBBLE_SHOT_KEY = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(FengxSkillsAndInheritance.MOD_ID, "bubble_shot"));
     public static RegistryKey<EntityType<?>> TELEPORT_PROJECTILE_KEY = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(FengxSkillsAndInheritance.MOD_ID, "teleport_projectile"));
     public static RegistryKey<EntityType<?>> REGENERATION_FIELD_ENTITY_KEY = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(FengxSkillsAndInheritance.MOD_ID, "regeneration_field"));
+    public static RegistryKey<EntityType<?>> BLACK_HOLE_KEY = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(FengxSkillsAndInheritance.MOD_ID, "black_hole"));
     //RegistryKey.of(RegistryKeys.ITEM, Identifier.of(FengxSkillsAndInheritance.MOD_ID, name));
     
     public static final EntityType<LuminousDrillEntity> LUMINOUS_DRILL = 
@@ -90,6 +91,13 @@ public class ModEntities {
                     .maxTrackingRange(64)
                     .trackingTickInterval(1)
                     .build(REGENERATION_FIELD_ENTITY_KEY);
+
+    public static final EntityType<BlackHoleEntity> BLACK_HOLE_ENTITY =
+            EntityType.Builder.<BlackHoleEntity>create(BlackHoleEntity::new, SpawnGroup.MISC)
+                    .dimensions(2f, 2f)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(1)
+                    .build(BLACK_HOLE_KEY);
     // public static final EntityType<SparkProjectileTriggerEntity> SPARK_PROJECTILE_TRIGGER = 
     //     EntityType.Builder.<SparkProjectileTriggerEntity>create(
     //         SparkProjectileTriggerEntity::new,
@@ -110,6 +118,7 @@ public class ModEntities {
         registerModEntity(LUMINOUS_DRILL, "luminous_drill");
         registerModEntity(TELEPORT_PROJECTILE, "teleport_projectile");
         registerModEntity(REGENERATION_FIELD_ENTITY, "regeneration_field");
+        registerModEntity(BLACK_HOLE_ENTITY, "black_hole");
         //registerModEntity(SPARK_PROJECTILE_TRIGGER, "spark_projectile_trigger");
     }
     //公用通道，暂无用途

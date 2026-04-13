@@ -5,11 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-/**
- * 充能类效果占位：可后续接法杖充能缩短等逻辑。
- */
-public class Recharge implements Spell {
-
+public class GravityAnti implements Spell{
     private static final double CASTING_DELAY = -0.15;
     private static final double RECHARGE_DELAY = -0.3;
     private static final double MANA_COST = 12;

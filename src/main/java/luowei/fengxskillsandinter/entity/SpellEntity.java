@@ -11,6 +11,7 @@ import luowei.fengxskillsandinter.spell.SpellCaster;
 import luowei.fengxskillsandinter.spell.SpellNode;
 import luowei.fengxskillsandinter.spell.spells.Homing;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
+import luowei.fengxskillsandinter.spell.spells.GravityAnti;
 import luowei.fengxskillsandinter.spell.spells.HeavySpread;
 import luowei.fengxskillsandinter.trajectory.HomingUtil;
 import luowei.fengxskillsandinter.util.SpellCastUtil;
@@ -42,20 +43,24 @@ public class SpellEntity extends ProjectileEntity{
     /** 玩家瞄准生成时，水平方向相对眼睛的偏移倍数（与 {@link #computeSpawnPosition} 一致）。 */
     public static final double PLAYER_SPAWN_FORWARD_OFFSET = 1.5;
 
-    private static final double HOMING_FOV_DEGREES = 28.0;
-    private static final double HOMING_MAX_RANGE = 24.0;
+    private static final double HOMING_FOV_DEGREES = 34.0;
+    private static final double HOMING_MAX_RANGE = 28.0;
     private static final double HOMING_ARG_A = 1.0;
     private static final double HOMING_ARG_B = 1.0;
-    private static final double HOMING_STEER_INERTIA = 0.20;
+    /** {@link HomingUtil#steerByGID}：惯性权重（越小越跟手）。 */
+    private static final double HOMING_STEER_INERTIA = 0.10;
+    /** steerByGID 中未参与混合，仅占位与将来预判扩展。 */
     private static final double HOMING_STEER_DISPLACE = 0.85;
-    private static final double HOMING_STEER_GUIDANCE = 0.35;
-    private static final double HOMING_STEER_DAMP = 0.20;
-    private static final double HOMING_STEER_MAX_STEP = 3.0;
+    /** steerByGID：导向权重（越大越贴目标方向）。 */
+    private static final double HOMING_STEER_GUIDANCE = 0.58;
+    /** steerByGID：速度下限 clamp。 */
+    private static final double HOMING_STEER_DAMP = 0.08;
+    /** steerByGID：速度上限 clamp。 */
+    private static final double HOMING_STEER_MAX_STEP = 4.0;
     private static final double HOMING_TO_OWNER_MIN_DIST_SQ = 1.0;
 
     private static final TrackedData<Boolean> TRACKED_HOMING = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> TRACKED_HOMING_TO_OWNER = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    /** 服务端写入、客户端读取：当前追踪目标（1.21+ 使用 LazyEntityReference 同步）。 */
     private static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> TRACKED_HOMING_TARGET = DataTracker.registerData(
             SpellEntity.class,
             TrackedDataHandlerRegistry.LAZY_ENTITY_REFERENCE);
@@ -71,11 +76,12 @@ public class SpellEntity extends ProjectileEntity{
     }
     private List<SpellNode> triggerChildren;
     /** 防止 onCollision 被多次调用导致触发法术重复执行 */
+
     private boolean hasTriggered = false;
     private boolean homing = false;
     private boolean homingToOwner = false;
-    /** 沉重散射：只在首次 tick 时把速度方向随机化（保留速度大小）。 */
     private boolean heavySpread = false;
+    private int gravityAnti = 1;
     private SpellCastContext context;
     
     public SpellEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
@@ -138,6 +144,7 @@ public class SpellEntity extends ProjectileEntity{
             return;
         }
         // 移动（与 velocity 一致，直线飞行）
+        
         this.applyGravity();
 
         
@@ -179,6 +186,14 @@ public class SpellEntity extends ProjectileEntity{
             this.discard();
         }
     }
+    @Override
+    protected void applyGravity() {
+        double d = this.getFinalGravity();
+        if (d != (double)0.0F) {
+           this.setVelocity(this.getVelocity().add((double)0.0F, -d * gravityAnti, (double)0.0F));
+        }
+  
+     }
     //碰撞检测
     @Override
     protected boolean canHit(Entity entity) {
@@ -248,6 +263,7 @@ public class SpellEntity extends ProjectileEntity{
         this.homing = false;
         this.homingToOwner = false;
         this.heavySpread = false;
+        this.gravityAnti = 1;
         if (effectSpellList == null) {
             this.dataTracker.set(TRACKED_HOMING, false);
             this.dataTracker.set(TRACKED_HOMING_TO_OWNER, false);
@@ -264,6 +280,9 @@ public class SpellEntity extends ProjectileEntity{
             }
             if(spell instanceof HeavySpread) {
                 this.heavySpread = true;
+            }
+            if(spell instanceof GravityAnti) {
+                this.gravityAnti = -1;
             }
             applyHeavySpreadToDirection(this.getVelocity());
         }
@@ -304,9 +323,9 @@ public class SpellEntity extends ProjectileEntity{
                             this.getPos(),
                             target.getEyePos(),
                             target.getVelocity(),
+                            HOMING_STEER_GUIDANCE,
                             HOMING_STEER_INERTIA,
                             HOMING_STEER_DISPLACE,
-                            HOMING_STEER_GUIDANCE,
                             HOMING_STEER_DAMP,
                             HOMING_STEER_MAX_STEP);
                 } else {
@@ -329,11 +348,11 @@ public class SpellEntity extends ProjectileEntity{
                     this.getPos(),
                     target.getEyePos(),
                     target.getVelocity(),
-                    0.20,
-                    0.85,
-                    0.35,
-                    0.20,
-                    3.0);
+                    HOMING_STEER_GUIDANCE,
+                    HOMING_STEER_INERTIA,
+                    HOMING_STEER_DISPLACE,
+                    HOMING_STEER_DAMP,
+                    HOMING_STEER_MAX_STEP);
         }
         return velocity;
         // 无有效目标时，退化为现有策略

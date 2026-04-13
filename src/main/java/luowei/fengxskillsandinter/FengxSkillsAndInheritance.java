@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import luowei.fengxskillsandinter.entity.ModEntities;
 import luowei.fengxskillsandinter.event.ManaCharge;
+import luowei.fengxskillsandinter.item.ModItemGroup;
 import luowei.fengxskillsandinter.item.ModItems;
 import luowei.fengxskillsandinter.network.ModNetwork;
 import luowei.fengxskillsandinter.spell.SpellRegistry;
@@ -38,5 +39,7 @@ public class FengxSkillsAndInheritance implements ModInitializer {
 		SpellRegistry.registerSpells();
 
 		ManaCharge.manaCharge();
+
+		ModItemGroup.initialize();
 	}
 }

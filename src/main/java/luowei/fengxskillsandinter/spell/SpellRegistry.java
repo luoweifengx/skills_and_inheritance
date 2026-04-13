@@ -10,14 +10,17 @@ import luowei.fengxskillsandinter.spell.spells.X2Spell;
 import luowei.fengxskillsandinter.spell.spells.X3Spell;
 import luowei.fengxskillsandinter.spell.spells.Chainsaw;
 import luowei.fengxskillsandinter.spell.spells.DiscBulletBig;
+import luowei.fengxskillsandinter.spell.spells.GravityAnti;
 import luowei.fengxskillsandinter.spell.spells.BubbleShot;
 import luowei.fengxskillsandinter.spell.spells.HeavySpread;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
+import luowei.fengxskillsandinter.spell.spells.LarpaDownwards;
 import luowei.fengxskillsandinter.spell.spells.Homing;
 import luowei.fengxskillsandinter.spell.spells.LuminousDrill;
 import luowei.fengxskillsandinter.spell.spells.ManaSpell;
 import luowei.fengxskillsandinter.spell.spells.Nuke;
 import luowei.fengxskillsandinter.spell.spells.Recharge;
+import luowei.fengxskillsandinter.spell.spells.BlackHole;
 import luowei.fengxskillsandinter.spell.spells.RegenerationField;
 import luowei.fengxskillsandinter.spell.spells.TeleportProjectile;
 import luowei.fengxskillsandinter.spell.spells.X4Spell;
@@ -41,8 +44,11 @@ public class SpellRegistry {
         register("disc_bullet_big", new DiscBulletBig(), ModItems.DISC_BULLET_BIG);
         register("teleport_projectile", new TeleportProjectile(), ModItems.TELEPORT_PROJECTILE);
         register("regeneration_field", new RegenerationField(), ModItems.REGENERATION_FIELD);
+        register("black_hole", new BlackHole(), ModItems.BLACK_HOLE);
         register("recharge", new Recharge(), ModItems.RECHARGE);
         register("mana", new ManaSpell(), ModItems.MANA);
+        register("gravity_anti", new GravityAnti(), ModItems.GRAVITY_ANTI);
+        register("larpa_downwards", new LarpaDownwards(), ModItems.LARPA_DOWNWARDS);
     }
 
     private static final Map<String, Spell> map_spells = new HashMap<>(); 

@@ -37,9 +37,12 @@ public class ModItems {
     public static Item DISC_BULLET_BIG;
     public static Item TELEPORT_PROJECTILE;
     public static Item REGENERATION_FIELD;
+    public static Item BLACK_HOLE;
     public static Item RECHARGE;
     public static Item MANA;
+    public static Item GRAVITY_ANTI;
     public static Item SPELL_CORE;
+    public static Item LARPA_DOWNWARDS;
     /**
      * 注册所有模组物品
      */
@@ -64,9 +67,12 @@ public class ModItems {
         DISC_BULLET_BIG = registerItem("disc_bullet_big", new SpellItem(new Item.Settings().registryKey(makeKey("disc_bullet_big")).maxCount(1), "disc_bullet_big"));
         TELEPORT_PROJECTILE = registerItem("teleport_projectile", new SpellItem(new Item.Settings().registryKey(makeKey("teleport_projectile")).maxCount(1), "teleport_projectile"));
         REGENERATION_FIELD = registerItem("regeneration_field", new SpellItem(new Item.Settings().registryKey(makeKey("regeneration_field")).maxCount(1), "regeneration_field"));
+        BLACK_HOLE = registerItem("black_hole", new SpellItem(new Item.Settings().registryKey(makeKey("black_hole")).maxCount(1), "black_hole"));
         RECHARGE = registerItem("recharge", new SpellItem(new Item.Settings().registryKey(makeKey("recharge")).maxCount(1), "recharge"));
         MANA = registerItem("mana", new SpellItem(new Item.Settings().registryKey(makeKey("mana")).maxCount(1), "mana"));
-        SPELL_CORE = registerItem("spell_core", new Item(new Item.Settings().registryKey(makeKey("spell_core")).maxCount(64)));
+        //SPELL_CORE = registerItem("spell_core", new Item(new Item.Settings().registryKey(makeKey("spell_core")).maxCount(64)));
+        GRAVITY_ANTI = registerItem("gravity_anti", new SpellItem(new Item.Settings().registryKey(makeKey("gravity_anti")).maxCount(1), "gravity_anti"));
+        LARPA_DOWNWARDS = registerItem("larpa_downwards", new SpellItem(new Item.Settings().registryKey(makeKey("larpa_downwards")).maxCount(1), "larpa_downwards"));
         // // 钻石锤（暂用钻石锄模型）
         // DIAMOND_HAMMER = registerItem("diamond_hammer",
         //     new HammerItem("diamond", new Item.Settings()
@@ -86,10 +92,48 @@ public class ModItems {
      * 将物品添加到创造模式物品组
      */
     private static void addItemsToGroup() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
+        ItemGroupEvents.modifyEntriesEvent(ModItemGroup.CUSTOM_ITEM_GROUP_KEY).register(entries -> {
             //entries.add(DIAMOND_HAMMER);
             entries.add(WAND);
-            entries.add(SPELL_CORE);
+            //entries.add(SPELL_CORE);
+            entries.add(BLACK_HOLE);
+            entries.add(RECHARGE);
+            entries.add(MANA);
+            entries.add(BURST_2);
+            entries.add(BURST_3);
+            entries.add(BURST_4);
+            entries.add(SPARK_PROJECTILE);
+            entries.add(CHAINSAW);
+            entries.add(SPARK_PROJECTILE_TRIGGER);
+            entries.add(HEAVY_SPREAD);
+            entries.add(HOMING_SHOOTER);
+            entries.add(HOMING);
+            entries.add(NUKE);
+            entries.add(LUMINOUS_DRILL);
+            entries.add(BUBBLE_SHOT);
+            entries.add(DISC_BULLET_BIG);
+            entries.add(TELEPORT_PROJECTILE);
+            entries.add(REGENERATION_FIELD);
+            entries.add(RECHARGE);
+            entries.add(MANA);
+            entries.add(BURST_2);
+            entries.add(BURST_3);
+            entries.add(BURST_4);
+            entries.add(SPARK_PROJECTILE);
+            entries.add(CHAINSAW);
+            entries.add(SPARK_PROJECTILE_TRIGGER);
+            entries.add(HEAVY_SPREAD);
+            entries.add(HOMING_SHOOTER);
+            entries.add(HOMING);
+            entries.add(NUKE);
+            entries.add(LUMINOUS_DRILL);
+            entries.add(BUBBLE_SHOT);
+            entries.add(DISC_BULLET_BIG);
+            entries.add(TELEPORT_PROJECTILE);
+            entries.add(REGENERATION_FIELD);
+            entries.add(RECHARGE);
+            entries.add(GRAVITY_ANTI);
+            entries.add(LARPA_DOWNWARDS);
         });
     }
     

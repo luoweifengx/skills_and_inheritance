@@ -1,4 +1,5 @@
 {
+  "itemGroup.fengx-skills-and-inheritance.main": "Fengx的技艺与传承",
   "item.fengx-skills-and-inheritance.birth_gift": "新生诞礼",
   "item.fengx-skills-and-inheritance.wooden_hammer": "木锤",
   "item.fengx-skills-and-inheritance.iron_hammer": "铁锤",
@@ -23,6 +24,7 @@
   "item.fengx-skills-and-inheritance.disc_bullet_big": "巨型锯片",
   "item.fengx-skills-and-inheritance.teleport_projectile": "传送弹",
   "item.fengx-skills-and-inheritance.regeneration_field": "再生领域",
+  "item.fengx-skills-and-inheritance.black_hole": "黑洞",
   "item.fengx-skills-and-inheritance.recharge": "充能",
   "item.fengx-skills-and-inheritance.mana": "魔力恢复",
   "item.fengx-skills-and-inheritance.spell_core": "法术核心",

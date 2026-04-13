@@ -58,7 +58,7 @@ public class RegenerationFieldEntity extends Entity {
     private void applyHealingServer(ServerWorld sw, Vec3d center) {
         double r = RADIUS;
         Box box = new Box(center, center).expand(r);
-        List<LivingEntity> targets = sw.getEntitiesByClass(LivingEntity.class, box,
+        List<LivingEntity> targets = sw.getEntitiesByClass(LivingEntity.class, box,//做范围内的实体检测，而非碰撞检查
                 e -> e.isAlive() && !e.isSpectator());
         for (LivingEntity target : targets) {
             if (target.squaredDistanceTo(center) > r * r) {
