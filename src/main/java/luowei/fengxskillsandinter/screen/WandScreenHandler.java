@@ -19,7 +19,14 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Hand;
 
 public class WandScreenHandler extends ScreenHandler{
-    
+
+    /**
+     * 法术槽 UI 固定格数（与 {@link WandItem#getCapacity} 可能不同步时也必须一致，否则客户端/服务端
+     * {@link net.minecraft.network.packet.s2c.play.InventoryS2CPacket} 槽位数不一致会越界崩溃）。
+     * 容量小于此值时多出的格子仅作空位；保存时只写入 {@link WandItem#getCapacity} 格。
+     */
+    public static final int SPELL_SLOT_COUNT = 45;
+
     private final Inventory inventory;
     private final ItemStack wandStack;
     private final Hand hand;
@@ -28,8 +35,7 @@ public class WandScreenHandler extends ScreenHandler{
 
     public WandScreenHandler(int syncId, PlayerInventory playerInventory, ItemStack wandStack, Hand hand, PlayerEntity player){
         super(ScreenHandlerType.GENERIC_9X1, syncId);//设置了ui为9x1的格子
-        int capacity = WandItem.getCapacity(wandStack);
-        this.inventory = new SimpleInventory(Math.max(capacity, 9));
+        this.inventory = new SimpleInventory(SPELL_SLOT_COUNT);
         this.wandStack = wandStack;
         this.hand = hand;
 
@@ -62,17 +68,18 @@ public class WandScreenHandler extends ScreenHandler{
     //加载
     private void loadSpellIntoInventory(ItemStack wandStack){
         List<String> spells = WandItem.getSpells(wandStack);//返回一个列表，存储着法术序列
-        for(int i = 0; i < inventory.size(); i++){//可能会越界，如果完全取相同值则不会有此问题
-            String spellId = spells.get(i);
-            
-            if(spellId != null && !spellId.isEmpty()){
+        for (int i = 0; i < inventory.size(); i++) {
+            String spellId = i < spells.size() ? spells.get(i) : "";
+
+            if (spellId != null && !spellId.isEmpty()) {
                 Item spellItem = SpellRegistry.getItem(spellId);
-                if(spellItem != null){
+                if (spellItem != null) {
                     this.inventory.setStack(i, new ItemStack(spellItem));
-                }
-                else{
+                } else {
                     this.inventory.setStack(i, ItemStack.EMPTY);
                 }
+            } else {
+                this.inventory.setStack(i, ItemStack.EMPTY);
             }
             //ItemStack spellItem = this.inventory.getStack(i);
             //spellItem.setCustomName(Text.literal(spells.get(i)));
@@ -80,15 +87,15 @@ public class WandScreenHandler extends ScreenHandler{
         }
     }
     /** 将法术槽位数据保存到指定法杖（支持UUID查找，防止移动法杖刷物品） */
-    private void saveSpellsToWand(ItemStack targetWand){
-        List<String> spells = new ArrayList<>();
-        for(int i = 0; i < inventory.size(); i++){
+    private void saveSpellsToWand(ItemStack targetWand) {
+        int cap = WandItem.getCapacity(targetWand);
+        List<String> spells = new ArrayList<>(cap);
+        for (int i = 0; i < cap; i++) {
             ItemStack stack = inventory.getStack(i);
-            if(!stack.isEmpty() && stack.getItem() instanceof SpellItem spellItem){
-                spells.add(i, spellItem.getSpellId());
-            }
-            else{
-                spells.add(i, "");
+            if (!stack.isEmpty() && stack.getItem() instanceof SpellItem spellItem) {
+                spells.add(spellItem.getSpellId());
+            } else {
+                spells.add("");
             }
         }
         WandItem.setSpells(targetWand, spells);

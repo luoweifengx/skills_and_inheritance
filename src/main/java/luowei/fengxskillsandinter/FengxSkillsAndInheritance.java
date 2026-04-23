@@ -5,11 +5,14 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import luowei.fengxskillsandinter.config.ItemAttributeRegistry;
+import luowei.fengxskillsandinter.block.ModBlocks;
 import luowei.fengxskillsandinter.entity.ModEntities;
 import luowei.fengxskillsandinter.event.ManaCharge;
 import luowei.fengxskillsandinter.item.ModItemGroup;
 import luowei.fengxskillsandinter.item.ModItems;
 import luowei.fengxskillsandinter.network.ModNetwork;
+import luowei.fengxskillsandinter.screen.RunicTableScreenHandler;
 import luowei.fengxskillsandinter.spell.SpellRegistry;
 //import luowei.fengxskillsandinter.villager.BlacksmithTrades;
 
@@ -27,9 +30,16 @@ public class FengxSkillsAndInheritance implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
+		ItemAttributeRegistry.load();
+
+		RunicTableScreenHandler.registryScreen();
+
 		// 注册村民交易
 		//BlacksmithTrades.registerTrades();
 		// 注册物品
+
+		ModBlocks.registerModBlocks();
+		
 		ModItems.registerModItems();
 		
 		ModEntities.registerModEntities();

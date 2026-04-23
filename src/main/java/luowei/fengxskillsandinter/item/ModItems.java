@@ -1,14 +1,15 @@
 package luowei.fengxskillsandinter.item;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import luowei.fengxskillsandinter.FengxSkillsAndInheritance;
+import luowei.fengxskillsandinter.block.ModBlocks;
 
 /**
  * 模组物品注册类
@@ -43,12 +44,13 @@ public class ModItems {
     public static Item GRAVITY_ANTI;
     public static Item SPELL_CORE;
     public static Item LARPA_DOWNWARDS;
+    public static Item RUNIC_TABLE;
     /**
      * 注册所有模组物品
      */
     public static void registerModItems() {
         FengxSkillsAndInheritance.LOGGER.info("Registering Mod Items for " + FengxSkillsAndInheritance.MOD_ID);
-
+        RUNIC_TABLE = registerItem("runic_table", new BlockItem(ModBlocks.RUNIC_TABLE, new Item.Settings().registryKey(makeKey("runic_table")).maxCount(64)));
         WAND = registerItem("wand", new WandItem(new Item.Settings().registryKey(makeKey("wand")).maxCount(1)));
         //法术
         BURST_2 = registerItem("burst_2", new SpellItem(new Item.Settings().registryKey(makeKey("burst_2")).maxCount(1), "burst_2"));
@@ -134,6 +136,7 @@ public class ModItems {
             entries.add(RECHARGE);
             entries.add(GRAVITY_ANTI);
             entries.add(LARPA_DOWNWARDS);
+            entries.add(RUNIC_TABLE);
         });
     }
     

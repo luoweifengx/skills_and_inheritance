@@ -67,6 +67,17 @@ public class WandItem extends Item {
         setSpellCachePointer(stack, DEFAULT_SPELL_CACHE_POINTER);
         setDrawCount(stack, DEFAULT_DRAW_COUNT);
     }
+    public static void setWand(ItemStack stack, List<Double> attributes){
+        // setOnCastingDelay(stack, DEFAULT_ON_CASTING_DELAY);
+        // setOnRechargeDelay(stack, DEFAULT_ON_RECHARGE_DELAY);
+        setCapacity(stack, attributes.get(0).intValue());
+        setCastingDelay(stack, attributes.get(1));
+        setRechargeDelay(stack, attributes.get(2));
+        setManaChargeSpeed(stack, attributes.get(3).doubleValue());
+        //setSpells(stack, new ArrayList<>());
+        setMaxinumMana(stack, attributes.get(4).doubleValue());
+        setDrawCount(stack, attributes.get(5).intValue());
+    }
     // //法杖id
     // public static void setWandId(ItemStack stack){
     //     if(!ItemDataHelper.contains(stack, WAND_ID)){

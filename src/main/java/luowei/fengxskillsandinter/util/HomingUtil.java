@@ -1,4 +1,4 @@
-package luowei.fengxskillsandinter.trajectory;
+package luowei.fengxskillsandinter.util;
 
 import java.util.List;
 

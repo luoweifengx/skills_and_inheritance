@@ -13,7 +13,7 @@ import luowei.fengxskillsandinter.spell.spells.Homing;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
 import luowei.fengxskillsandinter.spell.spells.GravityAnti;
 import luowei.fengxskillsandinter.spell.spells.HeavySpread;
-import luowei.fengxskillsandinter.trajectory.HomingUtil;
+import luowei.fengxskillsandinter.util.HomingUtil;
 import luowei.fengxskillsandinter.util.SpellCastUtil;
 import luowei.fengxskillsandinter.util.SpellDamageUtil;
 import net.minecraft.entity.EntityType;
