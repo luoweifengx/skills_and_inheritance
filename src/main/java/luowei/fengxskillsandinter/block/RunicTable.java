@@ -39,4 +39,5 @@ public class RunicTable extends Block {
         ));
         return ActionResult.CONSUME;
     }
+    
 }

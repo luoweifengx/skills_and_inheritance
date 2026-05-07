@@ -17,7 +17,7 @@ public class ModBlocks {
         
         //RUNIC_TABLE = registerBlock("runic_table", new Block(new Block().Settings().registryKey(makeKey("runic_table")), "runic_table"));
         // 继承石砖的挖掘/工具相关字段（1.21+ 仅靠 create()+requiresTool 可能导致镐无法累积破坏进度）。
-        // 仍通过 data/minecraft/tags/blocks/mineable/pickaxe 与 loot_table 控制：镐类可挖、木镐即可掉落。
+        // 仍通过 data/minecraft/tags/block/mineable/pickaxe（1.21+ 为 block 单数目录）与 loot_table 控制。
         RUNIC_TABLE = registerBlock(
             "runic_table",
             new RunicTable(
