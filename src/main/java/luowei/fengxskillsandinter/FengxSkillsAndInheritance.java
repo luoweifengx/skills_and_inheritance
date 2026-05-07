@@ -13,6 +13,7 @@ import luowei.fengxskillsandinter.item.ModItemGroup;
 import luowei.fengxskillsandinter.item.ModItems;
 import luowei.fengxskillsandinter.network.ModNetwork;
 import luowei.fengxskillsandinter.screen.RunicTableScreenHandler;
+import luowei.fengxskillsandinter.screen.WandScreenHandler;
 import luowei.fengxskillsandinter.spell.SpellRegistry;
 //import luowei.fengxskillsandinter.villager.BlacksmithTrades;
 
@@ -33,6 +34,7 @@ public class FengxSkillsAndInheritance implements ModInitializer {
 		ItemAttributeRegistry.load();
 
 		RunicTableScreenHandler.registryScreen();
+		WandScreenHandler.registryScreen();
 
 		// 注册村民交易
 		//BlacksmithTrades.registerTrades();

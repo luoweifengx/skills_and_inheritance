@@ -44,7 +44,8 @@ public class ChainsawEntity extends SpellEntity {
             if (!state.isIn(BlockTags.AXE_MINEABLE)) {
                 continue;
             }
-            sw.breakBlock(pos, false, this);
+            // drop=true：破坏时按战利品表掉落（false 则只碎方块不掉落）
+            sw.breakBlock(pos, true, this);
         }
     }
 

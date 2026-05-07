@@ -5,13 +5,17 @@ import java.util.List;
 
 import luowei.fengxskillsandinter.screen.WandScreenHandler;
 import luowei.fengxskillsandinter.util.ItemDataHelper;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class WandItem extends Item {
@@ -304,14 +308,25 @@ public class WandItem extends Item {
         ItemStack stack = player.getStackInHand(hand);
         if(!world.isClient){
             if(player.isSneaking()){
-                //潜行时显示法术列表
-                ItemStack wandStack = stack;
-                Hand finalhand = hand;
-                
-                player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                    (syncId, inventory, playerEntity) -> new WandScreenHandler(syncId, inventory, wandStack, finalhand, playerEntity)
-                    , Text.literal("法术列表")
-                ));
+                int spellSlots = MathHelper.clamp(WandItem.getCapacity(stack), 1, WandScreenHandler.MAX_SPELL_SLOTS);
+                int handOrd = hand.ordinal();
+
+                player.openHandledScreen(new ExtendedScreenHandlerFactory<WandScreenHandler.WandScreenOpenData>() {
+                    @Override
+                    public WandScreenHandler.WandScreenOpenData getScreenOpeningData(ServerPlayerEntity serverPlayer) {
+                        return new WandScreenHandler.WandScreenOpenData(spellSlots, handOrd);
+                    }
+
+                    @Override
+                    public Text getDisplayName() {
+                        return Text.literal("法术列表");
+                    }
+
+                    @Override
+                    public ScreenHandler createMenu(int syncId, PlayerInventory inventory, PlayerEntity playerEntity) {
+                        return new WandScreenHandler(syncId, inventory, new WandScreenHandler.WandScreenOpenData(spellSlots, handOrd));
+                    }
+                });
                 return ActionResult.CONSUME;
             }
         }

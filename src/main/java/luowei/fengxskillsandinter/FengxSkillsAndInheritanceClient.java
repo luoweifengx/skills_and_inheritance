@@ -11,6 +11,8 @@ import luowei.fengxskillsandinter.client.model.SparkProjectileModel;
 import luowei.fengxskillsandinter.client.renderer.RendererRegistry;
 import luowei.fengxskillsandinter.screen.RunicTableScreen;
 import luowei.fengxskillsandinter.screen.RunicTableScreenHandler;
+import luowei.fengxskillsandinter.screen.WandScreen;
+import luowei.fengxskillsandinter.screen.WandScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -42,6 +44,7 @@ public class FengxSkillsAndInheritanceClient implements ClientModInitializer {
         CastKey.register();
         SpellHudRenderer.register();
         HandledScreens.register(RunicTableScreenHandler.RUNIC_TABLE_SCREEN_HANDLER, RunicTableScreen::new);
+        HandledScreens.register(WandScreenHandler.WAND_SCREEN_HANDLER_TYPE, WandScreen::new);
     }
 }
 
