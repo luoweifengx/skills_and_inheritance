@@ -11,6 +11,7 @@ import luowei.fengxskillsandinter.spell.SpellCaster;
 import luowei.fengxskillsandinter.spell.SpellNode;
 import luowei.fengxskillsandinter.spell.spells.Homing;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
+import luowei.fengxskillsandinter.spell.spells.LarpaDownwards;
 import luowei.fengxskillsandinter.spell.spells.GravityAnti;
 import luowei.fengxskillsandinter.spell.spells.HeavySpread;
 import luowei.fengxskillsandinter.util.HomingUtil;
@@ -28,6 +29,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.server.world.ServerWorld;
@@ -57,6 +59,11 @@ public class SpellEntity extends ProjectileEntity{
     private static final double HOMING_STEER_DAMP = 0.08;
     /** steerByGID：速度上限 clamp。 */
     private static final double HOMING_STEER_MAX_STEP = 4.0;
+    /** Larpa 分身：竖直向下速度下限，避免 0 速「看不见在动」。 */
+    private static final double LARPA_DOWN_MIN_SPEED = 0.35;
+    /** Larpa：每隔多少 tick 在母体当前位置生成分身（仅服务端）。 */
+    private static final int LARPA_INTERVAL_TICKS = 10;
+
     private static final double HOMING_TO_OWNER_MIN_DIST_SQ = 1.0;
 
     private static final TrackedData<Boolean> TRACKED_HOMING = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -82,6 +89,7 @@ public class SpellEntity extends ProjectileEntity{
     private boolean homingToOwner = false;
     private boolean heavySpread = false;
     private int gravityAnti = 1;
+    private boolean larpaDownwards = false;
     private SpellCastContext context;
     
     public SpellEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
@@ -150,9 +158,38 @@ public class SpellEntity extends ProjectileEntity{
         
         setVelocity();
         //客户端粒子效果
+
+        spawnCopyProjectile();
+
         renderParticles();
 
         killEntity();
+    }
+    public void spawnCopyProjectile() {
+        if (!this.larpaDownwards || !(this.getWorld() instanceof ServerWorld world)) {
+            return;
+        }
+        if (this.age % LARPA_INTERVAL_TICKS != 0) {
+            return;
+        }
+        Entity created = this.getType().create(world, SpawnReason.TRIGGERED);
+        if (!(created instanceof SpellEntity fresh)) {
+            return;
+        }
+        // 仅「壳」：不参与触发链、不再 Larpa；与母体同伤害/重力/发射者、当前位置、竖直向下飞
+        fresh.triggerChildren = null;
+        fresh.context = null;
+        fresh.hasTriggered = false;
+        fresh.larpaDownwards = false;
+        fresh.configureFromSpell(this.damage, this.projectileGravity);
+        fresh.setOwner(this.getOwner());
+        fresh.setPosition(this.getX(), this.getY(), this.getZ());
+        double speed = Math.max(this.getVelocity().length(), LARPA_DOWN_MIN_SPEED);
+        Vec3d down = new Vec3d(0.0, -speed, 0.0);
+        fresh.setVelocity(down);
+        SpellCastUtil.applyFacingFromDirection(fresh, down);
+        fresh.getAndSolveEffect(null);
+        world.spawnEntity(fresh);
     }
     public void killEntity(){
         
@@ -264,6 +301,7 @@ public class SpellEntity extends ProjectileEntity{
         this.homingToOwner = false;
         this.heavySpread = false;
         this.gravityAnti = 1;
+        this.larpaDownwards = false;
         if (effectSpellList == null) {
             this.dataTracker.set(TRACKED_HOMING, false);
             this.dataTracker.set(TRACKED_HOMING_TO_OWNER, false);
@@ -282,7 +320,10 @@ public class SpellEntity extends ProjectileEntity{
                 this.heavySpread = true;
             }
             if(spell instanceof GravityAnti) {
-                this.gravityAnti = -1;
+                this.gravityAnti *= -1;
+            }
+            if(spell instanceof LarpaDownwards) {
+                this.larpaDownwards = true;
             }
             applyHeavySpreadToDirection(this.getVelocity());
         }

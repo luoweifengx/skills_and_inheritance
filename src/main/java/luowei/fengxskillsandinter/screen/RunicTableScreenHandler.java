@@ -6,6 +6,7 @@ import java.util.List;
 import luowei.fengxskillsandinter.FengxSkillsAndInheritance;
 import luowei.fengxskillsandinter.item.ModItems;
 import luowei.fengxskillsandinter.util.GenerateWand;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -18,6 +19,7 @@ import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -25,8 +27,9 @@ import net.minecraft.util.Identifier;
  * PANEL_* 需与 {@link RunicTableScreen} 背景尺寸一致。
  * <p>合成刷新仅在逻辑服务端执行，避免客户端与集成服双端重复计算；写结果槽时用相等判断避免多余同步。
  */
-public class RunicTableScreenHandler extends ScreenHandler implements InventoryChangedListener{
 
+public class RunicTableScreenHandler extends ScreenHandler implements InventoryChangedListener{
+    
     public static final int PANEL_WIDTH = 176;
     /** 含标题区、环形区、三行背包与快捷栏 */
     public static final int PANEL_HEIGHT = 184;
@@ -45,6 +48,8 @@ public class RunicTableScreenHandler extends ScreenHandler implements InventoryC
     private final PlayerInventory playerInventory;
     /** 写入结果槽时避免重入刷新 */
     private boolean suppressResultUpdate;
+    /** 取出成品批量扣原料时，避免每格触发一次 {@link #refreshCraftingResult()} */
+    private boolean ignoreTableInventoryEvents;
 
     public static void registryScreen() {
         RUNIC_TABLE_SCREEN_HANDLER =
@@ -72,6 +77,15 @@ public class RunicTableScreenHandler extends ScreenHandler implements InventoryC
             @Override
             public boolean canInsert(ItemStack stack) {
                 return false;
+            }
+
+            @Override
+            public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                super.onTakeItem(player, stack);
+                if (player.getWorld().isClient()) {
+                    return;
+                }
+                RunicTableScreenHandler.this.consumeInputsAndRefreshResult();
             }
         });
         
@@ -121,15 +135,57 @@ public class RunicTableScreenHandler extends ScreenHandler implements InventoryC
     }
 
     @Override
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+        if(player.getWorld().isClient()) {
+            return;
+        }
+        for(int i = 0; i < 8; i++) {
+            ItemStack stack = this.tableInventory.getStack(i);
+            if(!stack.isEmpty()) {
+                offerOrDropStack(player, stack);
+
+            }
+        }
+    }
+    
+    private void offerOrDropStack(PlayerEntity player, ItemStack stack) {
+        boolean bl = player.isRemoved() && player.getRemovalReason() != Entity.RemovalReason.CHANGED_DIMENSION;
+		boolean bl2 = player instanceof ServerPlayerEntity serverPlayerEntity && serverPlayerEntity.isDisconnected();
+		if (bl || bl2) {
+			player.dropItem(stack, false);
+		} else if (player instanceof ServerPlayerEntity) {
+			player.getInventory().offerOrDrop(stack);
+		}
+    }
+
+    @Override
     public void onInventoryChanged(Inventory inventory) {
         if (inventory != this.tableInventory) {
             return;
         }
+        if (this.ignoreTableInventoryEvents) {
+            return;
+        }
         this.refreshCraftingResult();
-        
     }
 
-    
+    /** 玩家拿起中心成品后：八格原料各耗 1，再刷新预览（与原版工作台结果槽语义一致）。 */
+    private void consumeInputsAndRefreshResult() {
+        this.ignoreTableInventoryEvents = true;
+        try {
+            for (int i = 0; i < 8; i++) {
+                ItemStack in = this.tableInventory.getStack(i);
+                if (!in.isEmpty()) {
+                    in.decrement(1);
+                    this.tableInventory.setStack(i, in.isEmpty() ? ItemStack.EMPTY : in);
+                }
+            }
+        } finally {
+            this.ignoreTableInventoryEvents = false;
+        }
+        this.refreshCraftingResult();
+    }
 
     @Override
     public boolean canUse(PlayerEntity player) {

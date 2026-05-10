@@ -1,17 +1,25 @@
 package luowei.fengxskillsandinter.client.hud;
 
+import luowei.fengxskillsandinter.FengxSkillsAndInheritance;
 import luowei.fengxskillsandinter.item.WandItem;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public final class SpellHudRenderer {
     private SpellHudRenderer() {
     }
 
     public static void register() {
-        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> render(drawContext));
+        Identifier layerId = Identifier.of(FengxSkillsAndInheritance.MOD_ID, "wand_spell_hud");
+        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> layeredDrawer.attachLayerAfter(
+            IdentifiedLayer.MISC_OVERLAYS,
+            layerId,
+            (drawContext, tickCounter) -> render(drawContext)));
     }
 
     private static void render(DrawContext context) {
@@ -55,7 +63,7 @@ public final class SpellHudRenderer {
         String text = "Mana " + (int) mana + "/" + (int) maxMana
                 + "  R " + rechargePercent + "%  C " + castingPercent + "%"
                 + "  Cap " + capacity + "  Draw " + drawCount;
-        context.drawText(client.textRenderer, text, x, y - 10, 0xFFFFFF, true);
+        context.drawText(client.textRenderer, Text.literal(text), x, y - 10, 0xFFFFFF, true);
     }
 
     private static ItemStack findWand(MinecraftClient client) {

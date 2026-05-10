@@ -28,6 +28,7 @@ public class WandItem extends Item {
     public static final String CURRENT_RECHARGE_DELAY = "current_recharge_delay";//用于中间的充能值计算
     public static final String CURRENT_CASTING_DELAY = "current_casting_delay";
     public static final String RECHARGE_DELAY_ENDS_AT = "recharge_delay_ends_at";
+    public static final String RAW_SCORE = "raw_score";
     // public static final String ON_CASTING_DELAY = "on_casting_delay";
     // public static final String ON_RECHARGE_DELAY = "on_recharge_delay";
     public static final String MAXINUM_MANA = "maxinum_mana";
@@ -52,6 +53,8 @@ public class WandItem extends Item {
     private static final double DEFAULT_MANA_CHARGE_SPEED = 30;
     private static final int DEFAULT_SPELL_CACHE_POINTER = 0;
 
+    private static final List<Double> DEFAULT_ATTRIBUTES = List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
     // public static final boolean DEFAULT_ON_CASTING_DELAY = false;
     // public static final boolean DEFAULT_ON_RECHARGE_DELAY = false;
     //private int CAPACITY;
@@ -71,7 +74,7 @@ public class WandItem extends Item {
         setSpellCachePointer(stack, DEFAULT_SPELL_CACHE_POINTER);
         setDrawCount(stack, DEFAULT_DRAW_COUNT);
     }
-    public static void setWand(ItemStack stack, List<Double> attributes){
+    public static void setWand(ItemStack stack, List<Double> attributes, List<Double> raw){
         // setOnCastingDelay(stack, DEFAULT_ON_CASTING_DELAY);
         // setOnRechargeDelay(stack, DEFAULT_ON_RECHARGE_DELAY);
         setCapacity(stack, attributes.get(0).intValue());
@@ -81,6 +84,7 @@ public class WandItem extends Item {
         //setSpells(stack, new ArrayList<>());
         setMaxinumMana(stack, attributes.get(4).doubleValue());
         setDrawCount(stack, attributes.get(5).intValue());
+        setAttributes(stack, raw);
     }
     // //法杖id
     // public static void setWandId(ItemStack stack){
@@ -105,6 +109,16 @@ public class WandItem extends Item {
     //     }
     //     return ItemDataHelper.getBoolean(stack, ON_RECHARGE_DELAY);
     // }
+
+    public static void setAttributes(ItemStack stack, List<Double> raw_score){
+        ItemDataHelper.setDoubleList(stack, RAW_SCORE, raw_score);
+    }
+    public static List<Double> getAttributes(ItemStack stack){
+        if(!ItemDataHelper.contains(stack, RAW_SCORE)){
+            setAttributes(stack, DEFAULT_ATTRIBUTES);
+        }
+        return ItemDataHelper.getDoubleList(stack, RAW_SCORE);
+    }
 
     //充能延迟结束时间
     public static void setRechargeDelayEndsAt(ItemStack stack, long rechargeDelayEndsAt){

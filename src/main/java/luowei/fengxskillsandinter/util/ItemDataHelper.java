@@ -4,6 +4,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
@@ -178,6 +179,43 @@ public class ItemDataHelper {
         // Java List → NBT 列表
         for (String str : value) {
             list.add(NbtString.of(str));
+        }
+        
+        nbt.put(key, list);
+        setNbt(stack, nbt);
+    }
+
+    public static List<Double> getDoubleList(ItemStack stack, String key) {
+        NbtCompound nbt = getNbt(stack);
+        if (!nbt.contains(key)) {
+            return new ArrayList<>(); // 如果不存在，返回空列表
+        }
+        
+        // 尝试获取列表
+        NbtElement element = nbt.get(key);
+        if (element == null || element.getType() != NbtElement.LIST_TYPE) {
+            return new ArrayList<>(); // 如果不是列表类型，返回空列表
+        }
+        
+        // NBT 列表 → Java List
+        NbtList nbtList = (NbtList) element;
+        List<Double> result = new ArrayList<>();
+        for (int i = 0; i < nbtList.size(); i++) {
+            NbtElement value = nbtList.get(i);
+            if (value.getType() == NbtElement.DOUBLE_TYPE) {
+                // asDouble() 返回 Optional<Double>，需要处理
+                value.asDouble().ifPresent(result::add);
+            }
+        }
+        return result;
+    }
+    public static void setDoubleList(ItemStack stack, String key, List<Double> value) {
+        NbtCompound nbt = getNbt(stack);
+        NbtList list = new NbtList();
+        
+        // Java List → NBT 列表
+        for (Double d : value) {
+            list.add(NbtDouble.of(d));
         }
         
         nbt.put(key, list);

@@ -137,6 +137,7 @@ public class ModItems {
             entries.add(GRAVITY_ANTI);
             entries.add(LARPA_DOWNWARDS);
             entries.add(RUNIC_TABLE);
+            
         });
     }
     
