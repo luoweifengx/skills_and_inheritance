@@ -64,7 +64,7 @@ public final class ItemTooltipCallback {
                 .formatted(Formatting.GRAY));
         lines.add(Text.translatable("tooltip.fengx-skills-and-inheritance.wand_casting", casting)
                 .formatted(Formatting.GRAY));
-        lines.add(Text.translatable("tooltip.fengx-skills-and-inheritance.wand_mana_current", currentMana, maxMana)
+        lines.add(Text.translatable("tooltip.fengx-skills-and-inheritance.wand_mana_current", maxMana)
                 .formatted(Formatting.GRAY));
         lines.add(Text.translatable("tooltip.fengx-skills-and-inheritance.wand_capacity", capacity)
                 .formatted(Formatting.GRAY));
