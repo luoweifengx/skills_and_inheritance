@@ -11,6 +11,7 @@ import luowei.fengxskillsandinter.spell.SpellCaster;
 import luowei.fengxskillsandinter.spell.SpellNode;
 import luowei.fengxskillsandinter.spell.spells.Homing;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
+import luowei.fengxskillsandinter.spell.spells.StrongHoming;
 import luowei.fengxskillsandinter.spell.spells.LarpaDownwards;
 import luowei.fengxskillsandinter.spell.spells.GravityAnti;
 import luowei.fengxskillsandinter.spell.spells.HeavySpread;
@@ -28,12 +29,14 @@ import net.minecraft.world.World;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.explosion.Explosion;
 
 public class SpellEntity extends ProjectileEntity{
 
@@ -42,19 +45,24 @@ public class SpellEntity extends ProjectileEntity{
     /** 短寿命静止实体默认存活 tick（子类可覆盖 {@link #getShortLivedStationaryTicks()}）。 */
     protected static final int DEFAULT_SHORT_LIVED_STATIONARY_TICKS = 2;
     protected static final double VELOCITY_EPSILON_SQ = 1.0E-7;
-    /** 玩家瞄准生成时，水平方向相对眼睛的偏移倍数（与 {@link #computeSpawnPosition} 一致）。 */
-    public static final double PLAYER_SPAWN_FORWARD_OFFSET = 1.5;
+    /** 沿瞄准方向相对 {@link LivingEntity#getEyePos()} 的前移格数（略离开身体再生成）。 */
+    public static final double PLAYER_SPAWN_FORWARD_OFFSET = 0.5;
 
     private static final double HOMING_FOV_DEGREES = 34.0;
     private static final double HOMING_MAX_RANGE = 28.0;
+    /** 强力追踪：半锥角更大、索敌更远。 */
+    private static final double STRONG_HOMING_FOV_DEGREES = 52.0;
+    private static final double STRONG_HOMING_MAX_RANGE = 46.0;
     private static final double HOMING_ARG_A = 1.0;
     private static final double HOMING_ARG_B = 1.0;
     /** {@link HomingUtil#steerByGID}：惯性权重（越小越跟手）。 */
     private static final double HOMING_STEER_INERTIA = 0.10;
+    private static final double STRONG_HOMING_STEER_INERTIA = 0.04;
     /** steerByGID 中未参与混合，仅占位与将来预判扩展。 */
     private static final double HOMING_STEER_DISPLACE = 0.85;
     /** steerByGID：导向权重（越大越贴目标方向）。 */
     private static final double HOMING_STEER_GUIDANCE = 0.58;
+    private static final double STRONG_HOMING_STEER_GUIDANCE = 0.86;
     /** steerByGID：速度下限 clamp。 */
     private static final double HOMING_STEER_DAMP = 0.08;
     /** steerByGID：速度上限 clamp。 */
@@ -67,6 +75,7 @@ public class SpellEntity extends ProjectileEntity{
     private static final double HOMING_TO_OWNER_MIN_DIST_SQ = 1.0;
 
     private static final TrackedData<Boolean> TRACKED_HOMING = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> TRACKED_STRONG_HOMING = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> TRACKED_HOMING_TO_OWNER = DataTracker.registerData(SpellEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Optional<LazyEntityReference<LivingEntity>>> TRACKED_HOMING_TARGET = DataTracker.registerData(
             SpellEntity.class,
@@ -86,6 +95,7 @@ public class SpellEntity extends ProjectileEntity{
 
     private boolean hasTriggered = false;
     private boolean homing = false;
+    private boolean strongHoming = false;
     private boolean homingToOwner = false;
     private boolean heavySpread = false;
     private int gravityAnti = 1;
@@ -102,9 +112,16 @@ public class SpellEntity extends ProjectileEntity{
         this.context = context;
         //this.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
     }
+
+    /** 不受爆炸伤害与击退，避免核弹等把自己弹道吹飞。 */
+    @Override
+    public boolean isImmuneToExplosion(Explosion explosion) {
+        return true;
+    }
     @Override
     protected void initDataTracker(DataTracker.Builder dataTracker) {
         dataTracker.add(TRACKED_HOMING, false);
+        dataTracker.add(TRACKED_STRONG_HOMING, false);
         dataTracker.add(TRACKED_HOMING_TO_OWNER, false);
         dataTracker.add(TRACKED_HOMING_TARGET, Optional.empty());
     }
@@ -243,6 +260,9 @@ public class SpellEntity extends ProjectileEntity{
         if (entity instanceof SpellEntity) {
             return false;
         }
+        if (entity instanceof ItemEntity) {
+            return false;
+        }
         return true;
     }
     //碰撞处理
@@ -298,12 +318,14 @@ public class SpellEntity extends ProjectileEntity{
     public void getAndSolveEffect(List<Spell> effectSpellList) {
         // 重置，保证同一实体若被复用/重建时状态不会串
         this.homing = false;
+        this.strongHoming = false;
         this.homingToOwner = false;
         this.heavySpread = false;
         this.gravityAnti = 1;
         this.larpaDownwards = false;
         if (effectSpellList == null) {
             this.dataTracker.set(TRACKED_HOMING, false);
+            this.dataTracker.set(TRACKED_STRONG_HOMING, false);
             this.dataTracker.set(TRACKED_HOMING_TO_OWNER, false);
             this.dataTracker.set(TRACKED_HOMING_TARGET, Optional.empty());
             return;
@@ -312,6 +334,10 @@ public class SpellEntity extends ProjectileEntity{
         for(Spell spell : effectSpellList) {
             if(spell instanceof Homing) {
                 this.homing = true;
+            }
+            if(spell instanceof StrongHoming) {
+                this.homing = true;
+                this.strongHoming = true;
             }
             if(spell instanceof HomingShooter) {
                 this.homingToOwner = true;
@@ -328,6 +354,7 @@ public class SpellEntity extends ProjectileEntity{
             applyHeavySpreadToDirection(this.getVelocity());
         }
         this.dataTracker.set(TRACKED_HOMING, this.homing);
+        this.dataTracker.set(TRACKED_STRONG_HOMING, this.strongHoming);
         this.dataTracker.set(TRACKED_HOMING_TO_OWNER, this.homingToOwner);
         if (!this.homing) {
             this.dataTracker.set(TRACKED_HOMING_TARGET, Optional.empty());
@@ -343,17 +370,23 @@ public class SpellEntity extends ProjectileEntity{
     }
     public Vec3d homing(Vec3d velocity) {
         World world = this.getWorld();
+        boolean strong = this.dataTracker.get(TRACKED_STRONG_HOMING);
+        double fovRad = Math.toRadians(strong ? STRONG_HOMING_FOV_DEGREES : HOMING_FOV_DEGREES);
+        double maxRange = strong ? STRONG_HOMING_MAX_RANGE : HOMING_MAX_RANGE;
+        double steerGuidance = strong ? STRONG_HOMING_STEER_GUIDANCE : HOMING_STEER_GUIDANCE;
+        double steerInertia = strong ? STRONG_HOMING_STEER_INERTIA : HOMING_STEER_INERTIA;
+
         if (!world.isClient) {
             Entity owner = this.getOwner();
             if (owner instanceof PlayerEntity player) {
-                // 射线起点用弹体（非玩家眼睛）：触发法术在远处生成时，怪物在弹丸附近但可能离玩家 > HOMING_MAX_RANGE，
+                // 射线起点用弹体（非玩家眼睛）：触发法术在远处生成时，怪物在弹丸附近但可能离玩家较远，
                 // 若从玩家眼算距离会筛掉；朝向仍用玩家视角。
                 LivingEntity target = HomingUtil.getHomingTarget(
                         this,
                         this.getEyePos(),
                         player.getRotationVector(),
-                        Math.toRadians(HOMING_FOV_DEGREES),
-                        HOMING_MAX_RANGE,
+                        fovRad,
+                        maxRange,
                         HOMING_ARG_A,
                         HOMING_ARG_B,
                         true);
@@ -364,8 +397,8 @@ public class SpellEntity extends ProjectileEntity{
                             this.getPos(),
                             target.getEyePos(),
                             target.getVelocity(),
-                            HOMING_STEER_GUIDANCE,
-                            HOMING_STEER_INERTIA,
+                            steerGuidance,
+                            steerInertia,
                             HOMING_STEER_DISPLACE,
                             HOMING_STEER_DAMP,
                             HOMING_STEER_MAX_STEP);
@@ -389,15 +422,13 @@ public class SpellEntity extends ProjectileEntity{
                     this.getPos(),
                     target.getEyePos(),
                     target.getVelocity(),
-                    HOMING_STEER_GUIDANCE,
-                    HOMING_STEER_INERTIA,
+                    steerGuidance,
+                    steerInertia,
                     HOMING_STEER_DISPLACE,
                     HOMING_STEER_DAMP,
                     HOMING_STEER_MAX_STEP);
         }
         return velocity;
-        // 无有效目标时，退化为现有策略
-        //TrajectorySteering.applySteerTowardViewWeightedNearestLiving(this);
     }
     public Vec3d homingToOwner(Vec3d velocity) {
         Entity target = this.getOwner();
@@ -455,12 +486,10 @@ public class SpellEntity extends ProjectileEntity{
     }
 
     public static Vec3d computeSpawnPosition(Entity caster, Vec3d aimDir) {
-        Vec3d casterPos = caster.getPos();
-        double eyeHeight = caster.getStandingEyeHeight();
-        if (caster instanceof PlayerEntity) {
-            return casterPos.add(aimDir.multiply(PLAYER_SPAWN_FORWARD_OFFSET).add(0.0, eyeHeight, 0.0));
+        if (caster instanceof LivingEntity living) {
+            return living.getEyePos().add(aimDir.multiply(PLAYER_SPAWN_FORWARD_OFFSET));
         }
-        return casterPos;
+        return caster.getPos().add(aimDir.multiply(PLAYER_SPAWN_FORWARD_OFFSET));
     }
     /**
      * 由法术在生成投射物后调用：设置本弹的伤害与重力（非 {@link SparkProjectileEntity} 子类也生效）。

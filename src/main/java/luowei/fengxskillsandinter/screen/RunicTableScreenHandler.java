@@ -34,12 +34,15 @@ public class RunicTableScreenHandler extends ScreenHandler implements InventoryC
     /** 含标题区、环形区、三行背包与快捷栏 */
     public static final int PANEL_HEIGHT = 184;
 
-    /** 与 {@link RunicTableScreen} 绘制输入槽边框共用 */
-    public static final int RING_CENTER_X = 88;
-    public static final int RING_CENTER_Y = 36;
+    /** 与 {@link RunicTableScreen} 绘制输入槽边框共用（略偏左、下移以便右侧法杖属性条留白） */
+    public static final int RING_CENTER_X = 80;
+    public static final int RING_CENTER_Y = 39;
     public static final int INPUT_RING_RADIUS = 28;
-    private static final int PLAYER_INV_TOP = 86;
-    private static final int PLAYER_HOTBAR_TOP = PLAYER_INV_TOP + 54;
+    /** 玩家背包首行 Y（与 {@link RunicTableScreen} 分隔线对齐） */
+    public static final int PLAYER_INV_TOP = 86;
+    public static final int PLAYER_HOTBAR_TOP = PLAYER_INV_TOP + 54;
+    /** 合成区（魔法阵 + 预览条）与背包区之间的分隔线 Y（面板内坐标） */
+    public static final int CRAFTING_PANEL_BOTTOM_Y = 78;
 
     public static ScreenHandlerType<RunicTableScreenHandler> RUNIC_TABLE_SCREEN_HANDLER;
 

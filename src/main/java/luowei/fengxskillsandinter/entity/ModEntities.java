@@ -73,7 +73,7 @@ public class ModEntities {
             ChainsawEntity::new,
             SpawnGroup.MISC
         )
-        .dimensions(0.5f, 0.5f)  // 宽度、高度
+        .dimensions(1.0f, 1.5f)  // 略增大判定盒：生成点更近时仍能覆盖脚边木方块
         .maxTrackingRange(PROJECTILE_TRACKING_RANGE)
         .trackingTickInterval(PROJECTILE_TRACKING_INTERVAL)
         .build(CHAINSAW_KEY);

@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 /**
- * 符文台 GUI：紫色系面板；环形槽与右侧预览条均为加粗边框。
+ * 符文台 GUI：合成区魔法阵 + 内框；背包区独立描边与行间分隔。
  */
 public class RunicTableScreen extends HandledScreen<RunicTableScreenHandler> {
 
@@ -25,9 +25,16 @@ public class RunicTableScreen extends HandledScreen<RunicTableScreenHandler> {
     private static final int FRAME_OUTER = 0xFFbfb0e8;
     private static final int FRAME_INNER = 0xFF3f2f58;
 
-    /** 输入槽：深紫描边，2px */
-    private static final int INPUT_SLOT_OUTLINE = 0xFF4a3868;
-    private static final int SLOT_BORDER_THICKNESS = 2;
+    /** 输入槽描边（魔法阵已有整体环形，槽位用细框即可） */
+    private static final int INPUT_SLOT_OUTLINE = 0xFF6b5690;
+    private static final int SLOT_BORDER_THICKNESS = 1;
+
+    /** 合成区 / 背包区分隔 */
+    private static final int SECTION_DIVIDER_MAIN = 0xDD9578d8;
+    private static final int CRAFTING_INNER_FRAME = 0x774a3868;
+    private static final int PLAYER_ZONE_FRAME = 0x993f2f58;
+    private static final int PLAYER_ROW_DIVIDER = 0x55484268;
+    private static final int PLAYER_HOTBAR_DIVIDER = 0x889578d8;
 
     private static final int BAR_COL_X = 118;
     private static final int BAR_WIDTH = 34;
@@ -79,6 +86,33 @@ public class RunicTableScreen extends HandledScreen<RunicTableScreenHandler> {
         GuiPanelBackdrop.fillVerticalGradient(context, left, top, w, h, BG_GRADIENT_TOP, BG_GRADIENT_BOTTOM);
         GuiPanelBackdrop.drawTopAccentBar(context, left, top, w, 2, ACCENT_BAR);
         GuiPanelBackdrop.drawDoubleOutline(context, left, top, w, h, FRAME_OUTER, FRAME_INNER);
+
+        int craftingH = RunicTableScreenHandler.CRAFTING_PANEL_BOTTOM_Y - 14;
+        GuiPanelBackdrop.drawThinOutline(context, left + 9, top + 10, w - 18, craftingH, CRAFTING_INNER_FRAME);
+
+        int rcx = left + RunicTableScreenHandler.RING_CENTER_X;
+        int rcy = top + RunicTableScreenHandler.RING_CENTER_Y;
+        MagicCircleDecoration.drawEightSlotMagicCircle(context, rcx, rcy, RunicTableScreenHandler.INPUT_RING_RADIUS);
+
+        int divY = top + RunicTableScreenHandler.CRAFTING_PANEL_BOTTOM_Y;
+        context.fill(left + 10, divY, left + w - 10, divY + 1, SECTION_DIVIDER_MAIN);
+
+        int invTop = top + RunicTableScreenHandler.PLAYER_INV_TOP;
+        int invBot = top + RunicTableScreenHandler.PLAYER_HOTBAR_TOP + 18;
+        GuiPanelBackdrop.drawThinOutline(context, left + 7, invTop - 4, w - 14, invBot - invTop + 8, PLAYER_ZONE_FRAME);
+
+        GuiPanelBackdrop.drawPlayerInventorySectionLines(
+            context,
+            left,
+            top,
+            8,
+            RunicTableScreenHandler.PLAYER_INV_TOP,
+            9,
+            18,
+            3,
+            4,
+            PLAYER_ROW_DIVIDER,
+            PLAYER_HOTBAR_DIVIDER);
     }
 
     @Override
@@ -120,14 +154,14 @@ public class RunicTableScreen extends HandledScreen<RunicTableScreenHandler> {
         int lx = BAR_COL_X - 14;
         for (int i = 0; i < 6; i++) {
             int rowY = BAR_BLOCK_TOP + i * (BAR_HEIGHT + BAR_ROW_GAP);
-            context.drawText(
-                this.textRenderer,
-                ATTR_LABEL[i],
-                lx,
-                rowY + (BAR_HEIGHT - this.textRenderer.fontHeight) / 2,
-                BAR_LABEL_COLOR,
-                false
-            );
+            // context.drawText(
+            //     this.textRenderer,
+            //     ATTR_LABEL[i],
+            //     lx,
+            //     rowY + (BAR_HEIGHT - this.textRenderer.fontHeight) / 2,
+            //     BAR_LABEL_COLOR,
+            //     false
+            // );
 
             int bx = BAR_COL_X;
             int bw = BAR_WIDTH;

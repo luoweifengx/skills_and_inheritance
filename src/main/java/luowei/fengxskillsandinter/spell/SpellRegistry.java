@@ -16,6 +16,7 @@ import luowei.fengxskillsandinter.spell.spells.HeavySpread;
 import luowei.fengxskillsandinter.spell.spells.HomingShooter;
 import luowei.fengxskillsandinter.spell.spells.LarpaDownwards;
 import luowei.fengxskillsandinter.spell.spells.Homing;
+import luowei.fengxskillsandinter.spell.spells.StrongHoming;
 import luowei.fengxskillsandinter.spell.spells.LuminousDrill;
 import luowei.fengxskillsandinter.spell.spells.ManaSpell;
 import luowei.fengxskillsandinter.spell.spells.Nuke;
@@ -38,6 +39,7 @@ public class SpellRegistry {
         register("heavy_spread", new HeavySpread(), ModItems.HEAVY_SPREAD);
         register("homing_shooter", new HomingShooter(), ModItems.HOMING_SHOOTER);
         register("homing", new Homing(), ModItems.HOMING);
+        register("strong_homing", new StrongHoming(), ModItems.STRONG_HOMING);
         register("nuke", new Nuke(), ModItems.NUKE);
         register("luminous_drill", new LuminousDrill(), ModItems.LUMINOUS_DRILL);
         register("bubble_shot", new BubbleShot(), ModItems.BUBBLE_SHOT);

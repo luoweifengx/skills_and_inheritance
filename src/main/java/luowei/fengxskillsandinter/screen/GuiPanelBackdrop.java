@@ -3,7 +3,7 @@ package luowei.fengxskillsandinter.screen;
 import net.minecraft.client.gui.DrawContext;
 
 /**
- * 极简面板底色：纵向渐变 + 顶栏强调线 + 细边框。
+ * GUI 底板：渐变、边框、线段、圆环近似描边；玩家背包行间分隔线。
  */
 public final class GuiPanelBackdrop {
 
@@ -53,6 +53,73 @@ public final class GuiPanelBackdrop {
         ctx.fill(x, y + h - t, x + w, y + h, argb);
         ctx.fill(x, y, x + t, y + h, argb);
         ctx.fill(x + w - t, y, x + w, y + h, argb);
+    }
+
+    /** Bresenham 粗线段（GUI，整数坐标）。 */
+    public static void drawLineThick(DrawContext ctx, int x0, int y0, int x1, int y1, int argb, int thicknessPx) {
+        int t = Math.max(1, thicknessPx);
+        int dx = x1 - x0;
+        int dy = y1 - y0;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        if (steps == 0) {
+            ctx.fill(x0 - t / 2, y0 - t / 2, x0 + (t + 1) / 2, y0 + (t + 1) / 2, argb);
+            return;
+        }
+        for (int i = 0; i <= steps; i++) {
+            int x = x0 + dx * i / steps;
+            int y = y0 + dy * i / steps;
+            ctx.fill(x - t / 2, y - t / 2, x + (t + 1) / 2, y + (t + 1) / 2, argb);
+        }
+    }
+
+    /** 折线逼近圆环描边。 */
+    public static void drawCircleStroke(DrawContext ctx, int cx, int cy, int radius, int argb, int thicknessPx, int segments) {
+        if (radius <= 0 || segments < 8) {
+            return;
+        }
+        int prevX = cx + radius;
+        int prevY = cy;
+        for (int i = 1; i <= segments; i++) {
+            double ang = 2.0 * Math.PI * i / segments;
+            int x = cx + (int) Math.round(Math.cos(ang) * radius);
+            int y = cy + (int) Math.round(Math.sin(ang) * radius);
+            drawLineThick(ctx, prevX, prevY, x, y, argb, thicknessPx);
+            prevX = x;
+            prevY = y;
+        }
+    }
+
+    /** 背包三行间细分隔 + 背包与快捷栏之间分隔线（屏幕绝对坐标 + 面板相对槽区原点）。 */
+    public static void drawPlayerInventorySectionLines(
+        DrawContext ctx,
+        int panelScreenLeft,
+        int panelScreenTop,
+        int panelRelativeOriginX,
+        int panelRelativeInvTopY,
+        int cols,
+        int slotStep,
+        int inventoryRows,
+        int gapPixelsAboveHotbar,
+        int rowDividerArgb,
+        int hotbarDividerArgb
+    ) {
+        int absInvTop = panelScreenTop + panelRelativeInvTopY;
+        int x1 = panelScreenLeft + panelRelativeOriginX + 3;
+        int x2 = panelScreenLeft + panelRelativeOriginX + cols * slotStep - 3;
+        if (x2 <= x1) {
+            return;
+        }
+        for (int row = 1; row < inventoryRows; row++) {
+            int y = absInvTop + row * slotStep;
+            ctx.fill(x1, y - 1, x2, y, rowDividerArgb);
+        }
+        int gapMid = absInvTop + inventoryRows * slotStep + Math.max(1, gapPixelsAboveHotbar / 2);
+        ctx.fill(x1, gapMid, x2, gapMid + 1, hotbarDividerArgb);
+    }
+
+    /** 分区标题下短线。 */
+    public static void drawSectionUnderline(DrawContext ctx, int screenX, int screenY, int widthPx, int argb) {
+        ctx.fill(screenX, screenY, screenX + widthPx, screenY + 1, argb);
     }
 
     private static int lerpArgb(int a, int b, float t) {

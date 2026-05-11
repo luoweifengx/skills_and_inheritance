@@ -42,9 +42,9 @@ public class WandScreenHandler extends ScreenHandler {
     private static final int SLOT_STEP = 18;
     /** 法术区底与玩家背包顶之间的间距（接近原版） */
     private static final int GAP_SPELL_TO_PLAYER = 14;
-    private static final int PLAYER_ROWS = 3;
-    private static final int PLAYER_COLS = 9;
-    private static final int HOTBAR_GAP_ABOVE = 4;
+    public static final int PLAYER_ROWS = 3;
+    public static final int PLAYER_COLS = 9;
+    public static final int HOTBAR_GAP_ABOVE = 4;
     private static final int BOTTOM_PADDING = 8;
 
     public static ExtendedScreenHandlerType<WandScreenHandler, WandScreenOpenData> WAND_SCREEN_HANDLER_TYPE;

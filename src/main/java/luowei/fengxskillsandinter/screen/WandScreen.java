@@ -6,7 +6,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 
 /**
- * 法杖法术界面：棕色古朴系底板（内浅边框深）；法术槽加粗描边。
+ * 法杖法术界面：法术区与背包区分开描边；背包行间细分隔 + 快捷栏分隔。
  */
 public class WandScreen extends HandledScreen<WandScreenHandler> {
 
@@ -18,11 +18,17 @@ public class WandScreen extends HandledScreen<WandScreenHandler> {
     private static final int FRAME_OUTER = 0xFF4a3018;
     private static final int FRAME_INNER = 0xFF140c06;
 
-    /** 法术槽：不透明显色，2px 描边 */
-    private static final int SPELL_SLOT_OUTLINE = 0xFF5c3818;
-    private static final int SLOT_BORDER_THICKNESS = 2;
+    /** 法术槽描边 */
+    private static final int SPELL_SLOT_OUTLINE = 0xFF7a4820;
+    private static final int SLOT_BORDER_THICKNESS = 1;
 
     private static final int PLAYER_INV_TITLE_ABOVE_FIRST_ROW = 11;
+
+    private static final int SECTION_DIVIDER_SPELL_PLAYER = 0xDDa07040;
+    private static final int SPELL_ZONE_FRAME = 0x994a3018;
+    private static final int PLAYER_ZONE_FRAME = 0x99381808;
+    private static final int PLAYER_ROW_DIVIDER = 0x55301808;
+    private static final int PLAYER_HOTBAR_DIVIDER = 0x88a07040;
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -55,6 +61,38 @@ public class WandScreen extends HandledScreen<WandScreenHandler> {
         GuiPanelBackdrop.fillVerticalGradient(context, left, top, w, h, BG_GRADIENT_TOP, BG_GRADIENT_BOTTOM);
         GuiPanelBackdrop.drawTopAccentBar(context, left, top, w, 2, ACCENT_BAR);
         GuiPanelBackdrop.drawDoubleOutline(context, left, top, w, h, FRAME_OUTER, FRAME_INNER);
+
+        int spellSlots = this.handler.getSpellSlotCount();
+        int spellRows = WandScreenHandler.spellRows(spellSlots);
+        int spellH = spellRows * 18 + 8;
+        GuiPanelBackdrop.drawThinOutline(
+            context,
+            left + 7,
+            top + WandScreenHandler.SPELL_ORIGIN_Y - 4,
+            w - 14,
+            spellH,
+            SPELL_ZONE_FRAME);
+
+        int divY = top + WandScreenHandler.playerInventoryTopY(spellSlots) - 6;
+        context.fill(left + 10, divY, left + w - 10, divY + 1, SECTION_DIVIDER_SPELL_PLAYER);
+
+        int invTopRel = WandScreenHandler.playerInventoryTopY(spellSlots);
+        int hotbarTopRel = invTopRel + WandScreenHandler.PLAYER_ROWS * 18 + WandScreenHandler.HOTBAR_GAP_ABOVE;
+        int invBot = top + hotbarTopRel + 18;
+        GuiPanelBackdrop.drawThinOutline(context, left + 7, top + invTopRel - 4, w - 14, invBot - (top + invTopRel) + 8, PLAYER_ZONE_FRAME);
+
+        GuiPanelBackdrop.drawPlayerInventorySectionLines(
+            context,
+            left,
+            top,
+            WandScreenHandler.SPELL_ORIGIN_X,
+            invTopRel,
+            WandScreenHandler.PLAYER_COLS,
+            18,
+            WandScreenHandler.PLAYER_ROWS,
+            WandScreenHandler.HOTBAR_GAP_ABOVE,
+            PLAYER_ROW_DIVIDER,
+            PLAYER_HOTBAR_DIVIDER);
     }
 
     @Override

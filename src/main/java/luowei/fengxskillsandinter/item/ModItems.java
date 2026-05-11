@@ -32,6 +32,7 @@ public class ModItems {
     public static Item HEAVY_SPREAD;
     public static Item HOMING_SHOOTER;
     public static Item HOMING;
+    public static Item STRONG_HOMING;
     public static Item NUKE;
     public static Item LUMINOUS_DRILL;
     public static Item BUBBLE_SHOT;
@@ -62,6 +63,7 @@ public class ModItems {
         HEAVY_SPREAD = registerItem("heavy_spread", new SpellItem(new Item.Settings().registryKey(makeKey("heavy_spread")).maxCount(1), "heavy_spread"));
         HOMING_SHOOTER = registerItem("homing_shooter", new SpellItem(new Item.Settings().registryKey(makeKey("homing_shooter")).maxCount(1), "homing_shooter"));
         HOMING = registerItem("homing", new SpellItem(new Item.Settings().registryKey(makeKey("homing")).maxCount(1), "homing"));
+        STRONG_HOMING = registerItem("strong_homing", new SpellItem(new Item.Settings().registryKey(makeKey("strong_homing")).maxCount(1), "strong_homing"));
         NUKE = registerItem("nuke", new SpellItem(new Item.Settings().registryKey(makeKey("nuke")).maxCount(1), "nuke"));
         LUMINOUS_DRILL = registerItem("luminous_drill", new SpellItem(new Item.Settings().registryKey(makeKey("luminous_drill")).maxCount(1), "luminous_drill"));
         BUBBLE_SHOT = registerItem("bubble_shot", new SpellItem(new Item.Settings().registryKey(makeKey("bubble_shot")).maxCount(1), "bubble_shot"));
@@ -110,6 +112,7 @@ public class ModItems {
             entries.add(HEAVY_SPREAD);
             entries.add(HOMING_SHOOTER);
             entries.add(HOMING);
+            entries.add(STRONG_HOMING);
             entries.add(NUKE);
             entries.add(LUMINOUS_DRILL);
             entries.add(BUBBLE_SHOT);
@@ -127,6 +130,7 @@ public class ModItems {
             entries.add(HEAVY_SPREAD);
             entries.add(HOMING_SHOOTER);
             entries.add(HOMING);
+            entries.add(STRONG_HOMING);
             entries.add(NUKE);
             entries.add(LUMINOUS_DRILL);
             entries.add(BUBBLE_SHOT);

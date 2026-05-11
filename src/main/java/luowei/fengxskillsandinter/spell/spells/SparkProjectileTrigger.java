@@ -29,6 +29,7 @@ public class SparkProjectileTrigger extends SparkProjectile {
             SparkProjectileEntity projectile = new SparkProjectileEntity(
                     ModEntities.SPARK_PROJECTILE, world, triggerChildren, context);
             projectile.getAndSolveEffect(effectSpellList);
+            lookVec = projectile.applyHeavySpreadToDirection(lookVec);
             projectile.setPosition(spawnPos.x, spawnPos.y, spawnPos.z);
             projectile.setVelocity(lookVec.multiply(SparkProjectile.START_SPEED));
             projectile.setOwner(SpellCastUtil.resolveOwnerForProjectile(caster));
